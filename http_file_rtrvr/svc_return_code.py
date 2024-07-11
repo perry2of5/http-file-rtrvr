@@ -1,0 +1,14 @@
+from enum import Enum
+
+
+class SvcReturnCode(Enum):
+    SUCCESS = '0000'
+    INVALID_REQ = '0010'
+    ERR_RTRV_CREDS = '0100'
+    LOGIN_ERROR = '0101'
+    ACCESS_DENIED = '0102'
+    DECOMPRESSION_FAILED = '0200'
+    MALWARE_FLAGGED = '0300'
+    UPLOAD_FAILED = '0400'
+    RESPONSE_FAILED = '0500'
+    OPERATION_UNSUPPORTED = '9999'

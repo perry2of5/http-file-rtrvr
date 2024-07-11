@@ -9,6 +9,7 @@ Exit codes are broken into different series where 1xx are access failures, 2xx a
 | Code | Meaning                                                     |
 |------|-------------------------------------------------------------|
 | 0000 | Success                                                     |
+| 0010 | Invalid Request                                             |
 | 0100 | Error Retrieving Credentials                                |
 | 0101 | Login Error (OAuth failure, HTTP 401, etc.)                 |
 | 0102 | Access Denied (HTTP 403)                                    |
@@ -16,6 +17,7 @@ Exit codes are broken into different series where 1xx are access failures, 2xx a
 | 0300 | File, or embedded file, flagged by Anti-malware             |
 | 0400 | Upload failed                                               |
 | 0500 | Response to source system (Airflow) failed                  |
+| 9999 | Operation unsupported                                       |
 [Exit codes]
 
 
