@@ -6,9 +6,22 @@ authors = ["Tim Perry <perry2of5@yahoo.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.12"
+python = "^3.12.4"
+dataclasses-json = "^0.6.7"
+requests = "^2.32.3"
+azure-storage-blob = "^12.21.0"
+azure-identity = "^1.17.1"
+azure-servicebus = "^7.12.3"
+aiohttp = "^3.10.10"
 
+[tool.poetry.group.test.dependencies]
+pytest = "^8.3.1"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+addopts = ["--import-mode=importlib"]
+norecursedirs = ["docs", "build"]
+testpaths = ["tests", "integration"]
