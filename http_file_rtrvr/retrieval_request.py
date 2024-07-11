@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from dataclasses_json import dataclass_json, LetterCase
-from http_file_rtrvr.http_method import SupportedHttpMethod
+from http_file_rtrvr.constants import SupportedHttpMethod
 
 
 @dataclass_json(letter_case=LetterCase.CAMEL)

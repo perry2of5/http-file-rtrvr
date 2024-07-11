@@ -1,6 +1,6 @@
 from http_file_rtrvr.retrieval_request import RetrievalRequest
-from http_file_rtrvr.svc_return_code import SvcReturnCode
-from http_file_rtrvr.http_method import SupportedHttpMethod
+from http_file_rtrvr.constants import SvcReturnCode
+from http_file_rtrvr.constants import SupportedHttpMethod
 import requests
 
 

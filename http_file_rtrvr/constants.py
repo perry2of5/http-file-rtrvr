@@ -14,3 +14,8 @@ class SvcReturnCode(Enum):
     DOWNLOAD_FAILED = '0400'
     RESPONSE_FAILED = '0500'
     OPERATION_UNSUPPORTED = '9999'
+
+
+class SupportedHttpMethod(Enum):
+    GET = 'GET'
+    POST = 'POST'
