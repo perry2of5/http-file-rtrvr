@@ -31,13 +31,15 @@ Based on this, we probably want to use Webhooks to get scan results. We could ha
 
 ### Setting up event handling
 Generally need follow these steps
-1. set up custom topic.
-2. configure Microsoft Defender for Cloud -> Storage -> Send scan results to topic....
-3. override default setting if needed:
+1. block access to un-scanned files and infected files.
+2. set up custom topic.
+3. configure Microsoft Defender for Cloud -> Storage -> Send scan results to topic....
+4. override default setting if needed:
    - Enable/disable the Malware Scanning or the Data sensitivity threat detection features.
    - Configure custom settings for Malware Scanning.
    - Disable Microsoft Defender for Storage on specific storage accounts
-
+5. process scan events.
+  
 
 
 
