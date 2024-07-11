@@ -1,6 +1,6 @@
 # HTTP File Retriever (http-file-rtrvr)
 This tool will retrieve a file from an HTTP or HTTPS location. A general flow is shown just below.
-[Interaction Diagram](interaction-diagram.png "HTTP File Retriever interaction diagram") (see Note 1).
+![Interaction Diagram](interaction-diagram.png "HTTP File Retriever interaction diagram") (see Note 1).
 
 ## Exit Codes
 Exit codes are broken into different series where 1xx are access failures, 2xx are file format failures, 3xx are concerns with file contents such as malware, 4xx indicates the files couldn't be uploaded to the staging area for dispatch for further processing (Airbyte), and 5xx indicates errors replying to the system which requested the file retrieval.
