@@ -7,8 +7,14 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.12"
-
+dataclasses-json = "^0.6.7"
+pytest = "^8.2.2"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+addopts = ["--import-mode=importlib"]
+norecursedirs = ["docs", "build"]
+testpaths = ["tests", "integration"]
