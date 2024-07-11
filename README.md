@@ -30,14 +30,14 @@ Exit codes are broken into different series where 1xx are access failures, 2xx a
 | 0100 | Error Retrieving Credentials                                |
 | 0101 | Login Error (OAuth failure, HTTP 401, etc.)                 |
 | 0102 | Access Denied (HTTP 403)                                    |
-| 0103 | File not found (HTTP 404)                                   |
+| 0103 | File Not Found (HTTP 404)                                   |
 | 0199 | Unknown Retrieval Error                                     |
 | 0200 | Decompression failed (unsupported format, corrupted, etc.)  |
 | 0300 | File, or embedded file, flagged by Anti-malware             |
-| 0400 | Download failed                                             |
+| 0400 | Upload Failed                                               |
 | 0500 | Response to source system (Airflow) failed                  |
 | 9999 | Operation unsupported                                       |
 [Exit codes]
 
 
-Note 1: Interaction diagram was built using plant-uml. Remember to update this URL when you make edits. https://www.plantuml.com/plantuml/uml/XP91Znen38Nl-HKMlK8lt3XKIojLbNheQcUxFPkCWL53J1rd4FtrDI45Gf6QK_0yVxpd-2afYkPTS1Hrq2EKinna7VW0xS44UFxGY2TVNb-VuVCG25v8PQ2HP78IhwtqeZAAwr5nXOcA_1bJEh3qqE6Q9bUs5-exPQ6MliowXOva77nLLojMxqR_m8g9YuKRiQ9iIE_0zcFsDaXEapRZw3o7G5u7ZWac9LanLbAbkNDr332RVRYcN83Ghqn9Iyb41XXHwMOEc9KlPOxENJw1aIu3C58Tv2ShdKnZI2woDScmsUe2bh-p47ob8xnX3Zg5vO_ESXj1qnH8_NjdromH_0t1yLxVXHDX8tY4cwi3EusPEju51DuCyM-qegjavPyK7SM-SVPjQOrJioOh4ZOpB73OebeOQVFMHxaRMuMVxk0vAaNzh_5shElrVPhcaNholDiBfLIg3m3dK2umxm5FIxB3S40XI1xD6GiG-ksrkvtRk83EOqtmO6m58fHoq9l_oVl0sDTwwKt_ijDy0T_FmgguOYlW2dwmBny3h-ggpEkMkDhkN4yF5lR9G7aN_W00
+Note 1: Interaction diagram was built using plant-uml. Remember to update this URL when you make edits. https://www.plantuml.com/plantuml/uml/ZLD1Rziy3BthLn3-hks7jDafXw7PkcB0Xgsek-wioamYJ14pYdBG_VhHgfDQRGxZoNb-VdnyPAwIM9Qy3GQZU7c2KalFgq1xgCiciCylAdBp-Vx-5cvyGBX3OOyzSZEGLmhT2VTiEYlsqIOiz5kRqfwuWzQki7dHTenTAyHOgo-pRA15xht3Pcf5yRPt9wmekLYOaCNo6kMLiFuuV_2SKrFFs1j78Q0JJp51KoOhnifKQMxC60ESdxz_cN81ZByp9YcGabIWjuAJ7DGp7M6AnXnVWIeT0r2bCSYF2WscRKX6iSmHt0IAf3hirninop-P4RxW4ppO7EGCbZzRQ57Paiu0nVrlPXUp6NnY9ZuioiSrJ5jWx63GD8PsybyOXDTids3oQ42hiZqkOW61rZuUGYYyqRBGBuo3-DJmzs6nP-gO7v59FHB3VcDbE9_1wWLyBNh5yCJPjFUurphvCQZo38wYO9GgAXM_XALpc19SO_JO3T3y-OI_aS0DvTZzSnZrKbUhLmdL9zAXe-sEjNL1JmYy3ce1iqlTs_NnGqyHRgmFQji4eXtOuP2tDkmj8oHdTNHYGEisBptgZVKBQ0jFqLCBAoBQAmTvwsQkRWxTEXHqSdIITu5iDtvPrDFRxcc-W1-5E66CZKU1kdLzuXy2FOxNFJySzZkrD4gMPARBUrQkHz22DfSBCAR34__KAnN8s_0N
