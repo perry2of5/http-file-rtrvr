@@ -2,6 +2,23 @@
 This tool will retrieve a file from an HTTP or HTTPS location. A general flow is shown just below.
 ![Interaction Diagram](interaction-diagram.png "HTTP File Retriever interaction diagram") (see Note 1).
 
+## Request Format
+Requests should be sent as JSON.
+
+    {
+        "method": "GET",
+        "url": "http://example.com/some/file",
+        "timeout_seconds": 5
+    }
+
+The following fields are mandatory:
+- url
+
+The following fields are optional:
+- method: defaults to GET. Valid options are GET or POST
+- timeout_seconds: integer seconds, defaults to 5 seconds
+
+
 ## Exit Codes
 Exit codes are broken into different series where 1xx are access failures, 2xx are file format failures, 3xx are concerns with file contents such as malware, 4xx indicates the files couldn't be uploaded to the staging area for dispatch for further processing (Airbyte), and 5xx indicates errors replying to the system which requested the file retrieval.
 
@@ -13,9 +30,11 @@ Exit codes are broken into different series where 1xx are access failures, 2xx a
 | 0100 | Error Retrieving Credentials                                |
 | 0101 | Login Error (OAuth failure, HTTP 401, etc.)                 |
 | 0102 | Access Denied (HTTP 403)                                    |
+| 0103 | File not found (HTTP 404)                                   |
+| 0199 | Unknown Retrieval Error                                     |
 | 0200 | Decompression failed (unsupported format, corrupted, etc.)  |
 | 0300 | File, or embedded file, flagged by Anti-malware             |
-| 0400 | Upload failed                                               |
+| 0400 | Download failed                                             |
 | 0500 | Response to source system (Airflow) failed                  |
 | 9999 | Operation unsupported                                       |
 [Exit codes]
