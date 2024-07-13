@@ -15,6 +15,7 @@ Limitations:
 - Blob scan limit: Malware Scanning can process up to 2,000 files per minute for each storage account. If the rate of file upload momentarily exceeds this threshold for a storage account, the system attempts to scan the files in excess of the rate limit. If the rate of file upload consistently exceeds this threshold, some blobs won't be scanned.
 - Blob size limit: The maximum size limit for a single blob to be scanned is 2 GB. Blobs that are larger than the limit won't be scanned.
 
+
 Scan results can be provided by:
 - blob index tags (can be manipulated so cannot be depended on)
 - Defender for Cloud security alerts
@@ -27,7 +28,7 @@ Scan results can be provided by:
     - Event Hubs & Service Bus Queue – to notify downstream consumers
 - Log Analytics -- definitely want this for audits, but not for file http_file_rtrvr
 
-Based on this, we probably want to use Webhooks to get scan results. We could have a similar async process callback if we write our own virus scanning using clam or something similar.
+Based on this, we probably want to use event grid to get scan results. We could have a similar messaging configuration if we write our own virus scanning using clam or something similar.
 
 ### Setting up event handling
 Generally need follow these steps
@@ -42,4 +43,10 @@ Generally need follow these steps
   
 
 
+## Handling AV Response
+When an AV scan completes, we'll get a message on a queue. Since the file downloaded might be an archive with multiple files, we need to see if any given AV response is the final response for the download file or archive.
 
+For this, we need to determine if the current response creates the need for a notification to Airflow. For this we could use:
+- RDBMS
+- Azure Cosmos with transaction batches to ensure we only send back completion to Airflow once with a message containing all updates. https://lennilobel.wordpress.com/2020/10/04/transactions-in-azure-cosmos-db-with-the-net-sdk/
+- AWS Dynamo DB with DynamoDB transactions to ensure we only send the completion back once. https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/transaction-apis.html
