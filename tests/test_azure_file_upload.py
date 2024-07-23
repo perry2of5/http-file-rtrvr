@@ -8,6 +8,8 @@ import pytest
 from pathlib import Path
 import os
 
+# TODO: update tests to delete the blobs after the test succeeds. Right now the second run fails
+# because the blob already exists.
 class TestBlobUploadingInFileToAzureBlobUploader:
     account_url = "https://devtimstoregrp1.blob.core.windows.net"
     cntnr_name = "testcontainer"
