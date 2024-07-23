@@ -5,7 +5,7 @@ class AbstractExtractor:
 
     def extract_to_temp_dir(
             archive: str, 
-            temp_dir: str) -> None:
+            temp_dir: str) -> str:
         """
         Extracts the contents of an archive to a temporary directory.
 
@@ -15,6 +15,8 @@ class AbstractExtractor:
                 should exist and the contents will be extracted into a directory named by the archive file name 
                 but with the extension removed. I.e., files from "archive.zip" will be extracted to 
                 "temp_dir/archive".
+        returns:
+            str: The path to the directory where the archive was extracted.
 
         Usage:
             None: use a subclass such as DirectoryToBlobUploader

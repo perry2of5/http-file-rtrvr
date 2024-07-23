@@ -9,7 +9,7 @@ class ZipExtractor(AbstractExtractor):
 
     def extract_to_temp_dir(
             archive: str, 
-            temp_dir: str) -> None:
+            temp_dir: str) -> str:
         """
         Extracts the contents of an archive to a temporary directory.
 
@@ -40,5 +40,6 @@ class ZipExtractor(AbstractExtractor):
                 os.makedirs(extract_dir)
             with ZipFile(archive, 'r') as zip_ref:
                 zip_ref.extractall(path=extract_dir)
+            return extract_dir
         except Exception as e:
             raise ExtractionException(f"Failed to extract {archive} to {extract_dir}.", e)

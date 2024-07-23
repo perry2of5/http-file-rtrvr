@@ -15,13 +15,16 @@ class TestZipExtractor:
 
         try:
             # get the name of the archive file
-            ZipExtractor.extract_to_temp_dir(test_archive_path, self.test_temp_dir)
+            extracted_to = ZipExtractor.extract_to_temp_dir(test_archive_path, self.test_temp_dir)
+
 
             archive_name_with_ext = os.path.basename(test_archive_path)
             archive_name = os.path.splitext(archive_name_with_ext)[0]
             expected_files = ["a.txt", "b.py"]
             # check to see all files were extracted
-            for file in os.listdir(os.path.join(self.test_temp_dir, archive_name)):
+            extracted_to_expected = os.path.join(self.test_temp_dir, archive_name)
+            assert extracted_to_expected == extracted_to
+            for file in os.listdir(extracted_to_expected):
                 print("Found file:", file)
                 expected_files.remove(file)
                 # delete extract file, we don't need it any more
