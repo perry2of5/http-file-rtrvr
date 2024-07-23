@@ -10,14 +10,9 @@ class AbstractFileTreeUploader():
     Blob Storage. A subclass should succeed in uploading all files in the directory or throw an
     exception.
 
-    Args:
-        None
-
-    Attributes:
-        None
-
     Methods:
-        upload_directory: Uploads a directory to Azure Blob Storage.
+        upload_file_tree: Uploads a file tree (directory) to Azure Blob Storage. File tree was used since
+                we might be uploading a zip file or contents of an SFTP server directory in the future.
 
     Usage:
         None: use a subclass such as DirectoryToBlobUploader
