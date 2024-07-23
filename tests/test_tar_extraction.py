@@ -43,8 +43,9 @@ class TestTarExtractor:
 
 
 
-        # Test that extract_to_temp_dir extracts the contents of the archive to the temporary directory.
+        # TODO: need to test extracting a .tar.gz file
+        # TODO: need to test extracting a .tar file
 
-        # Test that extract_to_temp_dir raises an ExtractionException if the temp_dir does not exist.
-        # Test that extract_to_temp_dir raises an ExtractionException if the archive does not exist.
-        # Test that extract_to_temp_dir raises an ExtractionException if the extraction fails.
+        # TODO: Test code raises an ExtractionException if the temp_dir does not exist.
+        # TODO: Test code raises an ExtractionException if the archive does not exist.
+        # TODO: Test code raises an ExtractionException if the extraction fails.
