@@ -1,4 +1,8 @@
 import os
+from http_file_rtrvr.retrieval_request import RetrievalRequest
+
+from datetime import datetime
+
 
 class AbstractFileTreeUploader():
     """
@@ -22,17 +26,23 @@ class AbstractFileTreeUploader():
     def __init__(self):
         pass
 
-    def upload_file_tree(self, file_tree_path: str):
-            """
-            Uploads the contents of a file tree (directory, zip, etc.) to a blob storage.
+    def upload_file_tree(
+            self, 
+            file_tree_path: str,
+            rtrvl_req: RetrievalRequest,
+            download_time: datetime) -> None:
+        """
+        Uploads the contents of a file tree (directory, zip, etc.) to a blob storage.
 
-            Args:
-                directory_path (str): The path of the base directory to be uploaded. Uploads walk 
-                the tree of files and upload all files found replicating the folder structure
-                remotely.
+        Args:
+            directory_path (str): The path of the base directory to be uploaded. Uploads walk 
+                    the tree of files and upload all files found replicating the folder structure
+                    remotely.
+            rtrvl_req (RetrievalRequest): The retrieval request object containing the requested URL
+                    and the save_to prefix.
+            download_time (datetime): The timestamp of the download.
 
-            Returns:
-                None
-            """
-            pass
-
+        Returns:
+            None
+        """
+        pass

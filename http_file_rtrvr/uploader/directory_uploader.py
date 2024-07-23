@@ -1,6 +1,8 @@
 from http_file_rtrvr.uploader.abstract_file_tree_uploader import AbstractFileTreeUploader
 from http_file_rtrvr.uploader.abstract_file_uploader import AbstractFileUploader
+from http_file_rtrvr.retrieval_request import RetrievalRequest
 
+from datetime import datetime
 import os
 
 class DirectoryUploader(AbstractFileTreeUploader):
@@ -26,23 +28,39 @@ class DirectoryUploader(AbstractFileTreeUploader):
         self.file_uploader = file_uploader
         pass
 
-    def upload_file_tree(self, file_tree_path: str):
+    def upload_file_tree(
+            self, 
+            file_tree_path: str,
+            rtrvl_req: RetrievalRequest,
+            download_time: datetime) -> None:
         """
         Uploads the contents of a file tree (directory, zip, etc.) to a blob storage.
 
         Args:
             directory_path (str): The path of the base directory to be uploaded. Uploads walk 
-            the tree of files and upload all files found replicating the folder structure
-            remotely.
+                    the tree of files and upload all files found replicating the folder structure
+                    remotely.
+            rtrvl_req (RetrievalRequest): The retrieval request object containing the requested URL
+                    and the save_to prefix.
+            download_time (datetime): The timestamp of the download.
 
         Returns:
             None
         """
-        for file in os.listdir(file_tree_path):
-            file_path = os.path.join(file_tree_path, file)
-            # If type of file is directory, call the function recursively, otherwise upload.
-            if os.path.isdir(file_path):
-                self.upload_directory(file_path)
-            else:
-                self.blob_uploader.upload_file(file_path, file)
+        self.upload_directory(file_tree_path, rtrvl_req, download_time, "")
 
+
+    def upload_directory(
+            self, 
+            file_tree_path: str,
+            rtrvl_req: RetrievalRequest,
+            download_time: datetime,
+            context_path: str) -> None:
+        for file in os.listdir(file_tree_path):
+            fq_file_path = os.path.join(file_tree_path, file)
+            # If type of file is directory, call the function recursively, otherwise upload.
+            if os.path.isdir(fq_file_path):
+                self.upload_directory(fq_file_path, rtrvl_req, download_time, os.path.join(context_path, file))
+            else:
+                upload_path = self.file_uploader.upload_path(download_time, rtrvl_req, os.path.join(context_path, file))
+                self.file_uploader.upload(fq_file_path, upload_path, rtrvl_req, download_time)
