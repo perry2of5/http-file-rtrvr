@@ -54,6 +54,11 @@ class FileToAzureBlobUploader(AbstractFileUploader):
 
         Returns:
             None
+
+        Raises:
+            FileUploadException: If the file cannot be uploaded to Azure Blob Storage.
+            ResourceExistsError: If the blob already exists.
+            ClientAuthenticationError: If the client cannot authenticate to Azure.
         """
         print("Uploading", fq_source_path, "to", "".join([self.blob_act_url,
                                                        self.blob_cntnr_name, dest_key]))
@@ -79,12 +84,15 @@ class FileToAzureBlobUploader(AbstractFileUploader):
                 fq_source_path,
                 "File open for % failed: %".format(fq_source_path, e.message),
                 e)
-        except HttpResponseError | ResourceNotFoundError | ResourceModifiedError | ResourceExistsError | ClientAuthenticationError | DecodeError as e:
+        except HttpResponseError | DecodeError as e:
+            # HttpResponseError also catches ResourceNotFoundError, ResourceModifiedError, ClientAuthenticationError,
+            # ResourceExistsError, and DecodeError. Converting to a locally defined exception for when we expand this
+            # to upload to other services besides Azure storage.
             raise FileUploadException(
-                rtrvl_req.url,
-                fq_source_path,
-                "Blob create for % failed: %".format(fq_source_path, e.message),
-                e)
+                    rtrvl_req.url,
+                    fq_source_path,
+                    "Blob create for % failed: %".format(fq_source_path, e.message),
+                    e)
 
     def upload_path(
             self, 

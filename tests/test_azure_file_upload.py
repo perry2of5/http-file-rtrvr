@@ -10,7 +10,7 @@ import os
 
 class TestBlobUploadingInFileToAzureBlobUploader:
     account_url = "https://devtimstoregrp1.blob.core.windows.net"
-    cntnr_name = "testcontainer2"
+    cntnr_name = "testcontainer"
     
     def test_upload_local_file(self):
         """
