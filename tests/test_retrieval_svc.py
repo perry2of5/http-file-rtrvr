@@ -13,7 +13,6 @@ def test_missing_url_returns_0010():
     rtrvl_svc = RetrievalSvc(AlwaysSucceedFileUploader(), AlwaysSucceedFileTreeUploader())
     assert SvcReturnCode.INVALID_REQ == rtrvl_svc.retrieve(no_url_req)
 
-
 def test_download_example_com_index_html_returns_0000():
     example_com_index_html_url = RetrievalRequest(
         url="https://example.com/index.html",

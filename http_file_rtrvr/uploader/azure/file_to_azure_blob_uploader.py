@@ -1,15 +1,14 @@
-
 from http_file_rtrvr.exceptions import FileUploadException
 from http_file_rtrvr.retrieval_request import RetrievalRequest
 from http_file_rtrvr.uploader.abstract_file_uploader import AbstractFileUploader
 
 from azure.identity import DefaultAzureCredential
 from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient, BlobType, ContentSettings
-from azure.storage.blob import ContainerProperties
 from datetime import datetime
 from mimetypes import guess_type
-from os import environ
 from urllib import parse as urlparser
+
+from pathlib import Path
 
 from azure.core.exceptions import (
     HttpResponseError,
@@ -33,13 +32,12 @@ class FileToAzureBlobUploader(AbstractFileUploader):
             blob_cntnr_name: str) -> None:
         self.blob_act_url: str = blob_act_url
         self.blob_cntnr_name: str = blob_cntnr_name
-        default_credential = DefaultAzureCredential()
-        blob_service_client: BlobServiceClient = BlobServiceClient(
-            blob_act_url, credential=default_credential)
+        self.blob_service_client: BlobServiceClient = BlobServiceClient(
+            blob_act_url, credential=DefaultAzureCredential())
 
     def upload(
             self,
-            source_path: str,
+            fq_source_path: str,
             dest_key: str,
             rtrvl_req: RetrievalRequest,
             download_time: datetime) -> None:
@@ -49,43 +47,50 @@ class FileToAzureBlobUploader(AbstractFileUploader):
         exist, then the container is created.
 
         Args:
-            source_path (str): The path of the file to upload.
+            fq_source_path (str): The fully-qualified path of the file to upload.
             dest_key (str): The destination key in Azure Blob Storage.
+            rtrvl_req (RetrievalRequest): The retrieval request object containing the requested URL and the save_to prefix.
+            download_time (datetime): The timestamp of the download.
 
         Returns:
             None
         """
-        print("Uploading", source_path, "to", "".join([self.blob_act_url,
-                                                       self.blob_ctnr_name, dest_key]))
-        blob_client: BlobClient = self.get_blob_client(dest_key)
-        content_and_encoding_type = guess_type(source_path)
+        print("Uploading", fq_source_path, "to", "".join([self.blob_act_url,
+                                                       self.blob_cntnr_name, dest_key]))
+        blob_client: BlobClient = self._get_blob_client(dest_key)
+        print("Got blob client")
+        content_and_encoding_type = guess_type(fq_source_path)
+        print("guessed encoding: ", content_and_encoding_type)
         # open file in binary and upload to blob
         try:
-            with open(source_path, "rb") as data:
+            print("opening", fq_source_path, "to upload")
+            with open(fq_source_path, "rb") as data:
+                print("starting upload to ", dest_key)
                 blob_client = blob_client.upload_blob(
                     data,
                     blob_type=BlobType.BlockBlob,
                     content_settings=ContentSettings(
                         content_type=content_and_encoding_type[0],
                         encoding=content_and_encoding_type[1]))
+                print("uploaded")
         except OSError as e:
             raise FileUploadException(
                 rtrvl_req.url,
-                source_path,
-                "File open for % failed: %".format(source_path, e.message),
+                fq_source_path,
+                "File open for % failed: %".format(fq_source_path, e.message),
                 e)
         except HttpResponseError | ResourceNotFoundError | ResourceModifiedError | ResourceExistsError | ClientAuthenticationError | DecodeError as e:
             raise FileUploadException(
                 rtrvl_req.url,
-                source_path,
-                "Blob create for % failed: %".format(source_path, e.message),
+                fq_source_path,
+                "Blob create for % failed: %".format(fq_source_path, e.message),
                 e)
 
     def upload_path(
             self, 
             download_time: datetime, 
             rtrvl_req: RetrievalRequest, 
-            local_path: str | None = None) -> str:
+            archive_path: str | None = None) -> str:
         """
         Generates a unique blob key based on the save_to (if included), download time, url, and local path
         within an archive (if applicable).
@@ -94,7 +99,9 @@ class FileToAzureBlobUploader(AbstractFileUploader):
             download_time (datetime): The timestamp of the download.
             rtrvl_req (RetrievalRequest): The retrieval request object containing the requested URL and the 
                     optional, save_to prefix.
-            local_path (str | None, optional): The local path to append to the blob key. Defaults to None.
+            archive_path (str | None, optional): The optional path to the file within an archive. Defaults to None 
+                    because I expect most files will not be in an archive.
+
 
         Returns:
             str: The generated blob key.
@@ -111,9 +118,8 @@ class FileToAzureBlobUploader(AbstractFileUploader):
             urlparser.urlparse(rtrvl_req.url).path)
 
         path_in_archive = ""
-        if local_path:
-            path_in_archive = self._strip_leading_and_trailing_slashes(
-                local_path)
+        if archive_path:
+            path_in_archive = self._strip_leading_and_trailing_slashes(archive_path)
 
         # filter out empty strings and then join with '/' as separator
         raw_blob_key = "/".join(list(filter(lambda x: x is not None and len(x) > 0,
@@ -124,7 +130,7 @@ class FileToAzureBlobUploader(AbstractFileUploader):
                 rtrvl_req.url, raw_blob_key, "Blob key too long", None)
         return encoded_key
 
-    def get_blob_client(self, blob_key: str) -> BlobClient:
+    def _get_blob_client(self, blob_key: str) -> BlobClient:
         """
         Returns the BlobClient object for the specified blob key.
 
@@ -138,7 +144,7 @@ class FileToAzureBlobUploader(AbstractFileUploader):
             None
         """
         cntnr_client: ContainerClient = self.get_cntnr_client()
-        return blob_key.get_blob_client(blob_key)
+        return cntnr_client.get_blob_client(blob_key)
 
     def get_cntnr_client(self) -> ContainerClient:
         """
@@ -155,9 +161,12 @@ class FileToAzureBlobUploader(AbstractFileUploader):
             None
 
         """
-        for cntnr_name in self.blob_service_client.list_containers():
-            if cntnr_name == self.blob_cntnr_name:
+        for cntnr in self.blob_service_client.list_containers():
+            if cntnr.name == self.blob_cntnr_name:
+                print("found", cntnr.name)
                 return self.blob_service_client.get_container_client(self.blob_cntnr_name)
+            else:
+                print("container", cntnr.name, "does not match", self.blob_cntnr_name)
 
         print("Target container", self.blob_cntnr_name,
               "was not found so created container in", self.blob_act_url)
