@@ -19,3 +19,10 @@ class SvcReturnCode(Enum):
 class SupportedHttpMethod(Enum):
     GET = 'GET'
     POST = 'POST'
+
+class FileType(Enum):
+    SIMPLE_FILE = 'simple'
+    ZIP_FILE = 'zip'
+    TAR_FILE = 'tar'
+    GZIP_FILE = 'gz'
+    GZIPPED_TAR_FILE = 'tgz'
