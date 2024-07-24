@@ -1,4 +1,7 @@
 # Anti-Virus
+## No Anti-Virus is currently included
+<u><b><i>WARNING WARNING WARING - no anti-virus is currently included</u></b></i><br>
+I envision using clam or one of the variants of it to provide anti-virus in the future. Right now, the implementation depends on the store the file is uploaded to blocking access to the file until a clean scan result is obtained by Microsoft Defender for Storage or similar.
 
 ## Microsoft Defender for Storage + Malware Scanning
 As of 2024-07-11, there is no free tier for malware scanning costs are:

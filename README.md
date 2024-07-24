@@ -1,6 +1,9 @@
 # HTTP File Retriever (http-file-rtrvr)
-This tool will retrieve a file from an HTTP or HTTPS location. A general flow is shown just below.
+This tool will retrieve a file from an HTTP or HTTPS location. A general flow is shown just below. Please be advised <i><b><u>the service does not currently include anti-virus</u></b></i> although it appears in the diagram which reflects a desired state rather than the current state.<br><br>
 ![Interaction Diagram](interaction-diagram.png "HTTP File Retriever interaction diagram") (see Note 1).
+
+<u><b><i>WARNING WARNING WARING - no anti-virus is currently included even though it appears in the diagram above as a desired feature</u></b></i><br>
+
 
 ## Request Format
 Requests should be sent as JSON.
