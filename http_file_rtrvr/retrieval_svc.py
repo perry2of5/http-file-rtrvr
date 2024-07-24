@@ -20,20 +20,20 @@ from urllib import parse as urlparser
 
 
 class RetrievalSvc:
-    def __init__(self, file_uploader: AbstractFileUploader, dir_uploader: DirectoryUploader) -> None:
+    def __init__(self, file_uploader: AbstractFileUploader, dir_uploader: DirectoryUploader,
+                 download_temp_dir: str) -> None:
         self.file_uploader = file_uploader
         self.dir_uploader = dir_uploader
-        # read from environment variable
-        self.svc_temp_dir = os.environ.get('HTTP_FILE_RTRVR_TEMP_DIR', '/tmp/http_rtvr_temp')
-        if not os.path.exists(self.svc_temp_dir):
-            os.makedirs(self.svc_temp_dir)
+        self.download_temp_dir = download_temp_dir
+        if not os.path.exists(self.download_temp_dir):
+            os.makedirs(self.download_temp_dir)
         pass
 
     def retrieve(self, retrieval_req: RetrievalRequest) -> SvcReturnCode:
         temp_dir: str = None
         try:
-            print("creating temp dir under", self.svc_temp_dir)
-            temp_dir = tempfile.mkdtemp(dir=self.svc_temp_dir)
+            print("creating temp dir under", self.download_temp_dir)
+            temp_dir = tempfile.mkdtemp(dir=self.download_temp_dir)
             print("temp dir created: ", temp_dir)
             if retrieval_req.url == None:
                 return SvcReturnCode.INVALID_REQ
