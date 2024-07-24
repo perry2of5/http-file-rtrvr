@@ -9,8 +9,12 @@ class AlwaysSucceedFileUploader(AbstractFileUploader):
     # list of tuples indicating the values upload_path has been called with in time-order
     upload_path_log = []
 
-    def upload(self, local_path: str, blob_key: str):
-        self.upload_log.append((local_path, blob_key))
+    def upload(self,
+            fq_source_path: str,
+            dest_key: str,
+            rtrvl_req: RetrievalRequest,
+            download_time: datetime) -> None:
+        self.upload_log.append((fq_source_path, dest_key))
         return
     
     def upload_path(

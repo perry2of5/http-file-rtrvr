@@ -17,9 +17,10 @@ def test_download_example_com_index_html_returns_0000():
     example_com_index_html_url = RetrievalRequest(
         url="https://example.com/index.html",
         method=SupportedHttpMethod.GET,
-        timeout_seconds=5,
+        timeout_seconds=10,
         save_to='some/prefix',
         file_type=FileType.SIMPLE_FILE)
     rtrvl_svc = RetrievalSvc(AlwaysSucceedFileUploader(), AlwaysSucceedFileTreeUploader())
-    assert SvcReturnCode.SUCCESS == rtrvl_svc.retrieve(
-        example_com_index_html_url)
+    print("retrieving")
+    rtrvl_result = rtrvl_svc.retrieve(example_com_index_html_url)
+    assert SvcReturnCode.SUCCESS == rtrvl_result

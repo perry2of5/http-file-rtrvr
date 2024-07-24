@@ -10,13 +10,7 @@ from urllib import parse as urlparser
 
 from pathlib import Path
 
-from azure.core.exceptions import (
-    HttpResponseError,
-    ResourceNotFoundError,
-    ResourceModifiedError,
-    ResourceExistsError,
-    ClientAuthenticationError,
-    DecodeError)
+from azure.core.exceptions import (HttpResponseError, DecodeError)
 
 import requests
 
@@ -84,10 +78,11 @@ class FileToAzureBlobUploader(AbstractFileUploader):
                 fq_source_path,
                 "File open for % failed: %".format(fq_source_path, e.message),
                 e)
-        except HttpResponseError | DecodeError as e:
-            # HttpResponseError also catches ResourceNotFoundError, ResourceModifiedError, ClientAuthenticationError,
-            # ResourceExistsError, and DecodeError. Converting to a locally defined exception for when we expand this
-            # to upload to other services besides Azure storage.
+        except HttpResponseError as e:
+            # HttpResponseError is the parent class of ResourceNotFoundError, ResourceModifiedError,
+            # ClientAuthenticationError, ResourceExistsError, and DecodeError. Converting to a
+            # locally defined exception for when we expand this to upload to other services besides
+            # Azure storage.
             raise FileUploadException(
                     rtrvl_req.url,
                     fq_source_path,

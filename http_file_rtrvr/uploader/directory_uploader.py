@@ -47,20 +47,23 @@ class DirectoryUploader(AbstractFileTreeUploader):
         Returns:
             None
         """
-        self.upload_directory(file_tree_path, rtrvl_req, download_time, "")
+        self._upload_directory(file_tree_path, rtrvl_req, download_time, "")
 
 
-    def upload_directory(
+    def _upload_directory(
             self, 
             file_tree_path: str,
             rtrvl_req: RetrievalRequest,
             download_time: datetime,
             context_path: str) -> None:
+        print("uploading directory", file_tree_path)
         for file in os.listdir(file_tree_path):
             fq_file_path = os.path.join(file_tree_path, file)
             # If type of file is directory, call the function recursively, otherwise upload.
             if os.path.isdir(fq_file_path):
-                self.upload_directory(fq_file_path, rtrvl_req, download_time, os.path.join(context_path, file))
+                print("Recursing into", file)
+                self._upload_directory(fq_file_path, rtrvl_req, download_time, os.path.join(context_path, file))
             else:
+                print("uploading file", fq_file_path)
                 upload_path = self.file_uploader.upload_path(download_time, rtrvl_req, os.path.join(context_path, file))
                 self.file_uploader.upload(fq_file_path, upload_path, rtrvl_req, download_time)

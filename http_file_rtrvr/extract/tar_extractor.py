@@ -7,7 +7,7 @@ class TarExtractor(AbstractExtractor):
     tar_gz_long_form = ".tar.gz"
 
     def __init__(self):
-        super(AbstractExtractor, self).__init__()
+        super().__init__()
 
     def extract_to_temp_dir(
             self,

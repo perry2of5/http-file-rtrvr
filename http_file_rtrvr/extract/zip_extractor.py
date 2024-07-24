@@ -5,9 +5,10 @@ import os
 
 class ZipExtractor(AbstractExtractor):
     def __init__(self):
-        super(AbstractExtractor, self).__init__()
+        super().__init__()
 
     def extract_to_temp_dir(
+            self,
             archive: str, 
             temp_dir: str) -> str:
         """
