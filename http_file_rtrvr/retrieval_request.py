@@ -9,7 +9,7 @@ from http_file_rtrvr.constants import FileType
 class RetrievalRequest:
     url: str
     save_to: str = ""
-    file_type: FileType = FileType.SIMPLE_FILE
+    file_type: FileType = FileType.SIMPLE
     method: SupportedHttpMethod = SupportedHttpMethod.GET
     timeout_seconds: int = 5
     accept_type: str | None = None

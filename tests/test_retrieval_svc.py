@@ -9,7 +9,7 @@ def test_missing_url_returns_0010():
         url=None,
         method=SupportedHttpMethod.GET,
         save_to='some/prefix',
-        file_type=FileType.SIMPLE_FILE)
+        file_type=FileType.SIMPLE)
     rtrvl_svc = RetrievalSvc(AlwaysSucceedFileUploader(), AlwaysSucceedFileTreeUploader())
     assert SvcReturnCode.INVALID_REQ == rtrvl_svc.retrieve(no_url_req)
 
@@ -19,7 +19,7 @@ def test_download_example_com_index_html_returns_0000():
         method=SupportedHttpMethod.GET,
         timeout_seconds=10,
         save_to='some/prefix',
-        file_type=FileType.SIMPLE_FILE)
+        file_type=FileType.SIMPLE)
     rtrvl_svc = RetrievalSvc(AlwaysSucceedFileUploader(), AlwaysSucceedFileTreeUploader())
     print("retrieving")
     rtrvl_result = rtrvl_svc.retrieve(example_com_index_html_url)

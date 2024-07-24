@@ -19,7 +19,7 @@ class TestBlobKeyGenerationFileToAzureBlobUploader:
         rtrvl_req = RetrievalRequest(
             "http://example.com/" + target_url_path,
             save_to,
-            FileType.SIMPLE_FILE)
+            FileType.SIMPLE)
                                      
         expected_upload_path = "/".join([
             save_to,
@@ -44,7 +44,7 @@ class TestBlobKeyGenerationFileToAzureBlobUploader:
         rtrvl_req = RetrievalRequest(
             "http://example.com/" + target_url_path,
             save_to,
-            FileType.SIMPLE_FILE)
+            FileType.SIMPLE)
                                      
         expected_upload_path = "/".join([
             "2023-03-09T08-07-01",
@@ -67,7 +67,7 @@ class TestBlobKeyGenerationFileToAzureBlobUploader:
         rtrvl_req = RetrievalRequest(
             "http://example.com/" + target_url_path,
             save_to,
-            FileType.SIMPLE_FILE)
+            FileType.SIMPLE)
                                      
         expected_upload_path = "/".join([
             "2023-03-09T08-07-01",

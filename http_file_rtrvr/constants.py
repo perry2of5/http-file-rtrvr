@@ -21,8 +21,5 @@ class SupportedHttpMethod(Enum):
     POST = 'POST'
 
 class FileType(Enum):
-    SIMPLE_FILE = 'simple'
-    ZIP_FILE = 'zip'
-    TAR_FILE = 'tar'
-    GZIP_FILE = 'gz'
-    GZIPPED_TAR_FILE = 'tgz'
+    SIMPLE = 'simple'
+    ARCHIVE = 'archive'

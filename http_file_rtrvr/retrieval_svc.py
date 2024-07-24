@@ -63,7 +63,7 @@ class RetrievalSvc:
                 # determine if response is text or binary
                 response_file = self._save_response(temp_dir, retrieval_req, response)
 
-                if retrieval_req.file_type == FileType.SIMPLE_FILE:
+                if retrieval_req.file_type == FileType.SIMPLE:
                     upload_path = self.file_uploader.upload_path(download_start_dtm, retrieval_req)
                     self.file_uploader.upload(response_file, upload_path, retrieval_req, download_start_dtm)
                 else:

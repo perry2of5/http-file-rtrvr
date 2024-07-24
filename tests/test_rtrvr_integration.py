@@ -19,7 +19,7 @@ class TestSingleFileIntegration:
             method=SupportedHttpMethod.GET,
             timeout_seconds=10,
             save_to='int_single_test',
-            file_type=FileType.SIMPLE_FILE)
+            file_type=FileType.SIMPLE)
         file_uploader_svc = FileToAzureBlobUploader(account_url, cntnr_name)
         rtrvl_svc = RetrievalSvc(file_uploader_svc, DirectoryUploader(file_uploader_svc))
         print("retrieving")
@@ -35,7 +35,7 @@ class TestArchiveDownloadIntegration:
             method=SupportedHttpMethod.GET,
             timeout_seconds=30,
             save_to='int_arch_test',
-            file_type=FileType.ZIP_FILE)
+            file_type=FileType.ARCHIVE)
         file_uploader_svc = FileToAzureBlobUploader(account_url, cntnr_name)
         rtrvl_svc = RetrievalSvc(file_uploader_svc, DirectoryUploader(file_uploader_svc))
         print("retrieving")
