@@ -2,7 +2,7 @@
 # to the runtime. This way we get a 159 MB image instead of a 270 MB image.
 
 ############ builder (contains poetry) ############
-FROM python:3.12.4-slim-bookworm as builder
+FROM python:3.12.4-slim-bookworm AS builder
 
 RUN pip install poetry==1.8.3
 
@@ -25,7 +25,7 @@ RUN poetry install --without test --no-root --no-cache
 
 
 ############ runtime without poetry so it is smaller ############
-FROM python:3-slim as runtime
+FROM python:3-slim AS runtime
 
 RUN useradd -ms /bin/bash svcuser
 RUN chown svcuser:svcuser /home/svcuser
