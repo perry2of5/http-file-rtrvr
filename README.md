@@ -20,6 +20,7 @@ The service expects to retrieve credentials from the Azure Container it is runni
 | Request Timeout Secs.  | TARGET_RTRVL_TIMEOUT_SECS | Env Var Svc  | Timeout for web request to URL                                   |
 | Request HTTP Method    | TARGET_RTRVL_METHOD       | Env Var Svc  | HTTP GET for now. In the future POST and possibly others.        |
 | Request HTTP Headers   | TARGET_RTRVL_HTTP_HEADERS | Env Var Svc  | HTTP Headers to send with the request                            |
+
 [Environment Variables]
 
 
