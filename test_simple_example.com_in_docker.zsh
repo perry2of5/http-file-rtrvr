@@ -1,6 +1,6 @@
 docker run \
     -v ~/.azure:/home/svcuser/.azure \
-    --ENV PYTHONPATH=. \
+    --env PYTHONPATH=. \
     --env STORAGE_ACCOUNT_URL=https://devtimstoregrp1.blob.core.windows.net \
     --env STORAGE_CONTAINER_NAME=testcontainer \
     --env DOWNLOAD_TEMP_DIR=/tmp/http_rtrvr_temp \

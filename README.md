@@ -4,6 +4,24 @@ This tool will retrieve a file from an HTTP or HTTPS location. A general flow is
 
 <u><b><i>WARNING WARNING WARING - no anti-virus is currently included even though it appears in the diagram above as a desired feature</u></b></i><br>
 
+## Environment Configuration
+The service expects to retrieve credentials from the Azure Container it is running in or from the Azure CLI when running locally for debugging. It needs to know the following.
+
+| Resource               | Variable                  | When         | Description                                                      |
+|------------------------|---------------------------|--------------|------------------------------------------------------------------|
+| Storage Account URL    | STORAGE_ACCOUNT_URL       | Always       | The Azure storage account to save the data to blobs within.      |
+| Storage Container Name | STORAGE_CONTAINER_NAME    | Always       | Container name within the storage account to save blobs to.      |
+| Temp Folder            | DOWNLOAD_TEMP_DIR         | Always       | Local folder to save files in temporarily.                       |
+| Servce Bus Namespace   | SVC_BUS_FQN               | Svc Bus Only | Fully Qualified Service Bus name. e.g., tim-dev-airflow-azure-msg-bus.servicebus.windows.net |
+| Request Queue          | QUEUE_NAME                | Svc Bus Only | Name of queue download requests will arrive on.                  |
+| Request URL            | TARGET_RTRVL_URL          | Env Var Svc  | URL to retrieve file from                                        |
+| Request SAVE_TO        | TARGET_RTRVL_SAVE_TO      | Env Var Svc  | Prefix to save blob under                                        |
+| Request File Type      | TARGET_RTRVL_FILE_TYPE    | Env Var Svc  | Type of file - Simple or Archive (zip, tar, tgz, etc)            |
+| Request Timeout Secs.  | TARGET_RTRVL_TIMEOUT_SECS | Env Var Svc  | Timeout for web request to URL                                   |
+| Request HTTP Method    | TARGET_RTRVL_METHOD       | Env Var Svc  | HTTP GET for now. In the future POST and possibly others.        |
+| Request HTTP Headers   | TARGET_RTRVL_HTTP_HEADERS | Env Var Svc  | HTTP Headers to send with the request                            |
+[Environment Variables]
+
 
 ## Request Format
 Requests should be sent as JSON.
@@ -45,11 +63,11 @@ Exit codes are broken into different series where 1xx are access failures, 2xx a
 # Build Directions
 Build the docker image with the following. Removing the --no-cache speeds up the build, but seems to occasionally miss changes to the files (I'm probably doing it wrong).
 
-    docker build --no-cache -t timstestcntnrreg.azurecr.io/http_file_rtrvr:0.0.2 .
+    docker build --no-cache -t ${ACR_NAME}.azurecr.io/http_file_rtrvr:0.0.3 .
 
 Upload the docker image to ACR 
 
-    docker push timstestcntnrreg.azurecr.io/http_file_rtrvr:0.0.1
+    docker push ${ACR_NAME}.azurecr.io/http_file_rtrvr:0.0.3
 
 # References
 

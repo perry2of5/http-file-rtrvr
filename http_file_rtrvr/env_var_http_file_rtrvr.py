@@ -25,10 +25,10 @@ def main():
         target_rtrvl_timeout_secs = int(os.environ.get('TARGET_RTRVL_TIMEOUT_SECS', '10'))
         target_rtrvl_method = SupportedHttpMethod[os.environ.get('TARGET_RTRVL_METHOD', 'GET').upper()]
 
-        target_rtrvl_headers_str = os.environ.get('TARGET_RTRVL_HEADERS')
-        target_rtrvl_headers = None
-        if target_rtrvl_headers_str is not None and len(target_rtrvl_headers_str) > 0:
-            target_rtrvl_headers = ast.literal_eval(target_rtrvl_headers_str)
+        target_rtrvl_http_headers_str = os.environ.get('TARGET_RTRVL_HTTP_HEADERS')
+        target_rtrvl_http_headers = None
+        if target_rtrvl_http_headers_str is not None and len(target_rtrvl_http_headers_str) > 0:
+            target_rtrvl_http_headers = ast.literal_eval(target_rtrvl_http_headers_str)
 
         file_uploader = FileToAzureBlobUploader(storage_account_url, storage_container_name)
         dir_uploader = DirectoryUploader(file_uploader)
@@ -40,16 +40,14 @@ def main():
             timeout_seconds=target_rtrvl_timeout_secs,
             save_to=target_rtrvl_save_to,
             file_type=target_rtrvl_file_type,
-            headers=target_rtrvl_headers
+            http_headers=target_rtrvl_http_headers
         )
         print('Processing retrieval request...', rtrvl_req)
 
         svc_rtrn_cd = rtrvl_svc.retrieve(rtrvl_req)
-        print ("finished at", datetime.now())
-        print(svc_rtrn_cd)
+        print("finished at", datetime.now(), "with status", svc_rtrn_cd.status.value)
     except Exception as e:
-        print("failure at", datetime.now())
-        print("failure: ", e)
+        print("failure at", datetime.now(), e)
 
 
 if __name__ == "__main__":

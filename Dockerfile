@@ -3,6 +3,7 @@
 
 ############ builder (contains poetry) ############
 FROM python:3.12.4-slim-bookworm AS builder
+# FROM python:3.12.4-alpine3.19 AS builder
 
 RUN pip install poetry==1.8.3
 
@@ -11,6 +12,9 @@ ENV POETRY_NO_INTERACTION=1 \
     POETRY_VIRTUALENVS_CREATE=1
 
     
+# add user for alpine
+# RUN addgroup -S svcuser && adduser -S svcuser -G svcuser -h /home/svcuser -s /bin/bash
+# add user for python-slim
 RUN useradd -ms /bin/bash svcuser
 RUN chown svcuser:svcuser /home/svcuser
 USER svcuser
@@ -26,10 +30,17 @@ RUN poetry install --without test --no-root --no-cache
 
 ############ runtime without poetry so it is smaller ############
 FROM python:3-slim AS runtime
+# FROM python:3.12.4-alpine3.19 AS runtime
 
+
+# add user for alpine
+# RUN addgroup -S svcuser && adduser -S svcuser -G svcuser -h /home/svcuser -s /bin/bash
+# add user for python-slim
 RUN useradd -ms /bin/bash svcuser
 RUN chown svcuser:svcuser /home/svcuser
 USER svcuser
+WORKDIR /home/svcuser
+
 # ensure expected temp dir will exist and is only readable by svcuser
 WORKDIR /tmp/http_rtrvr_temp
 RUN chown svcuser:svcuser /tmp/http_rtrvr_temp

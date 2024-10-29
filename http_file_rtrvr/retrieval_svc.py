@@ -1,4 +1,5 @@
 from http_file_rtrvr.retrieval_request import RetrievalRequest
+from http_file_rtrvr.retrieval_response import RetrievalResponse
 from http_file_rtrvr.uploader.azure.file_to_azure_blob_uploader import FileToAzureBlobUploader
 from http_file_rtrvr.exceptions import FileDecompressionFailedException, FileUploadException
 from http_file_rtrvr.extract.extraction_exception import ExtractionException
@@ -29,58 +30,84 @@ class RetrievalSvc:
             os.makedirs(self.download_temp_dir)
         pass
 
-    def retrieve(self, retrieval_req: RetrievalRequest) -> SvcReturnCode:
+    def retrieve(self, retrieval_req: RetrievalRequest) -> RetrievalResponse:
+        if retrieval_req.url == None:
+            print("Invalid request: URL is required")
+            return self._create_response(retrieval_req, datetime.now(), SvcReturnCode.INVALID_REQ)
         temp_dir: str = None
         try:
-            print("creating temp dir under", self.download_temp_dir)
+            print("Creating temp dir under", self.download_temp_dir)
             temp_dir = tempfile.mkdtemp(dir=self.download_temp_dir)
-            print("temp dir created: ", temp_dir)
-            if retrieval_req.url == None:
-                return SvcReturnCode.INVALID_REQ
+            print("Temp dir created:", temp_dir)
+            if retrieval_req.method == SupportedHttpMethod.GET:
+                print("GET", retrieval_req.url)
+                return self._get(temp_dir, retrieval_req)
+            elif retrieval_req.method == SupportedHttpMethod.POST:
+                print("POST", retrieval_req.url)
+                return self._post(temp_dir, retrieval_req)
             else:
-                if retrieval_req.method == SupportedHttpMethod.GET:
-                    return self._get(temp_dir, retrieval_req)
-                elif retrieval_req.method == SupportedHttpMethod.POST:
-                    return self._post(temp_dir, retrieval_req)
-                else:
-                    return SvcReturnCode.OPERATION_UNSUPPORTED
+                print("Cannot handle", retrieval_req.method, "for", retrieval_req.url)
+                return self._create_response(
+                    retrieval_req, datetime.now(), SvcReturnCode.OPERATION_UNSUPPORTED)
         finally:
             if temp_dir is not None and os.path.exists(temp_dir):
                 rmtree(temp_dir)
                 print("removed temp dir", temp_dir)
 
-    def _get(self, temp_dir: str, retrieval_req: RetrievalRequest) -> SvcReturnCode:
+    def _get(self, temp_dir: str, retrieval_req: RetrievalRequest) -> RetrievalResponse:
         # implement get
         download_start_dtm = datetime.now()
+        rtrvl_result = self._create_success_response(retrieval_req, download_start_dtm)
         response = requests.get(url=retrieval_req.url, timeout=retrieval_req.timeout_seconds,
-                headers=retrieval_req.headers)
+                headers=retrieval_req.http_headers)
+        print("status code", response.status_code, "for HTTP GET", retrieval_req.url)
         return_code = self._derive_return_code(response.status_code)
-        print("response code", return_code, "for", retrieval_req.url)
+        rtrvl_result.status = return_code
         if return_code == SvcReturnCode.SUCCESS:
-            response.raise_for_status()
             response_file: str = None
             try:                
+                response.raise_for_status()
                 # determine if response is text or binary
                 response_file = self._save_response(temp_dir, retrieval_req, response)
 
                 if retrieval_req.file_type == FileType.SIMPLE:
-                    upload_path = self.file_uploader.upload_path(download_start_dtm, retrieval_req)
-                    self.file_uploader.upload(response_file, upload_path, retrieval_req, download_start_dtm)
+                    self.file_uploader.upload(
+                        response_file, rtrvl_result.saved_to, retrieval_req, download_start_dtm)
                 else:
                     self._decompress_and_upload(retrieval_req, response_file, temp_dir, download_start_dtm)
             except FileUploadException as e:
                 # TODO: need to add logging here and need to export logs to central location
                 print("Upload to ", e.upload_url, "failed:", e.message)
-                return SvcReturnCode.DOWNLOAD_FAILED
+                rtrvl_result.status = SvcReturnCode.UPLOAD_FAILED
             except FileDecompressionFailedException as e:
                 print("Decompression failed for", retrieval_req.url, ":", e.message)
-                return SvcReturnCode.DECOMPRESSION_FAILED
+                rtrvl_result.status = SvcReturnCode.DECOMPRESSION_FAILED
+            except Exception as e:
+                print("Download", retrieval_req.url, "failure:", e)
+                rtrvl_result.status = SvcReturnCode.DOWNLOAD_FAILED
             finally:
                 if response_file is not None and os.path.exists(response_file):
-                    os.remove(response_file)
-                    print("removed temp file", response_file)
+                    try:
+                        os.remove(response_file)
+                        print("removed temp file", response_file)
+                    except OSError as e:
+                        print("Failed to remove temp file", response_file, ":", e)
+        return rtrvl_result
 
-        return return_code
+    def _create_success_response(
+            self, retrieval_req: RetrievalRequest, download_start_dtm: datetime) -> RetrievalResponse:
+        return self._create_response(retrieval_req, download_start_dtm, SvcReturnCode.SUCCESS)
+
+    def _create_response(
+            self, retrieval_req: RetrievalRequest, download_start_dtm: datetime, status: SvcReturnCode) -> RetrievalResponse:
+        rtrvl_resp = RetrievalResponse(
+            source_url=retrieval_req.url,
+            status=status,
+            saved_to=self.file_uploader.upload_path(download_start_dtm, retrieval_req),
+            file_type=retrieval_req.file_type,
+            method=retrieval_req.method
+        )
+        return rtrvl_resp
     
     def _decompress_and_upload(
             self, 
@@ -109,10 +136,12 @@ class RetrievalSvc:
                 print("removed temp dir", extract_file_dir)
         pass
     
-    def _post(self, temp_dir: str, retrieval_req: RetrievalRequest) -> SvcReturnCode:
+    def _post(self, temp_dir: str, retrieval_req: RetrievalRequest) -> RetrievalResponse:
         # implement post
         print('implement post to', retrieval_req.url)
-        return SvcReturnCode.OPERATION_UNSUPPORTED
+        rtrvl_result = self._create_success_response(retrieval_req)
+        rtrvl_result.status = SvcReturnCode.OPERATION_UNSUPPORTED
+        return rtrvl_result
 
     def _save_response(
             self, 
@@ -140,10 +169,3 @@ class RetrievalSvc:
             return SvcReturnCode.FILE_NOT_FOUND
         else:
             return SvcReturnCode.UNKNOWN_RETRIEVAL_ERROR
-
-    def _add_header(headers: map, key: str, value: str) -> map:
-        if headers == None:
-            headers = {key: value}
-        else:
-            headers.put(key, value)
-        return headers
