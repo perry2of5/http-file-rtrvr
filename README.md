@@ -5,7 +5,7 @@ This tool will retrieve a file from an HTTP or HTTPS location. A general flow is
 <u><b><i>WARNING WARNING WARING - no anti-virus is currently included even though it appears in the diagram above as a desired feature</u></b></i><br>
 
 ## Environment Variables
-The service expects to retrieve credentials from the Azure Container it is running in or from the Azure CLI when running locally for debugging. It still needs to know the following and for now they are passed in as environment variables. To debug in VSCode you can use "envFile": "${workspaceFolder}/some/path/asb/.env" where the some/path/asb part is a random subdirectory.
+The service expects to retrieve credentials from the Azure Container it is running in or from the Azure CLI when running locally for debugging. It still needs to know the following and for now they are passed in as environment variables. To debug in VSCode you can use "envFile": "${workspaceFolder}/some/path/asb/.env" in the launch.json where the some/path/asb part is a random subdirectory.
 
 | Resource               | Variable                  | When         | Description                                                      |
 |------------------------|---------------------------|--------------|------------------------------------------------------------------|
