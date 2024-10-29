@@ -4,8 +4,8 @@ This tool will retrieve a file from an HTTP or HTTPS location. A general flow is
 
 <u><b><i>WARNING WARNING WARING - no anti-virus is currently included even though it appears in the diagram above as a desired feature</u></b></i><br>
 
-## Environment Configuration
-The service expects to retrieve credentials from the Azure Container it is running in or from the Azure CLI when running locally for debugging. It needs to know the following.
+## Environment Variables
+The service expects to retrieve credentials from the Azure Container it is running in or from the Azure CLI when running locally for debugging. It still needs to know the following and for now they are passed in as environment variables. To debug in VSCode you can use "envFile": "${workspaceFolder}/some/path/asb/.env" where the some/path/asb part is a random subdirectory.
 
 | Resource               | Variable                  | When         | Description                                                      |
 |------------------------|---------------------------|--------------|------------------------------------------------------------------|
@@ -20,8 +20,6 @@ The service expects to retrieve credentials from the Azure Container it is runni
 | Request Timeout Secs.  | TARGET_RTRVL_TIMEOUT_SECS | Env Var Svc  | Timeout for web request to URL                                   |
 | Request HTTP Method    | TARGET_RTRVL_METHOD       | Env Var Svc  | HTTP GET for now. In the future POST and possibly others.        |
 | Request HTTP Headers   | TARGET_RTRVL_HTTP_HEADERS | Env Var Svc  | HTTP Headers to send with the request                            |
-
-[Environment Variables]
 
 
 ## Request Format
