@@ -43,7 +43,7 @@ WORKDIR /home/svcuser
 
 # ensure expected temp dir will exist and is only readable by svcuser
 WORKDIR /home/svcuser/tmp/http_rtrvr_temp
-RUN chown svcuser:svcuser /home/svcuser/tmp/http_rtrvr_temp
+# RUN chown svcuser:svcuser /home/svcuser/tmp/http_rtrvr_temp
 RUN chmod 700 /home/svcuser/tmp/http_rtrvr_temp
 # change to home directory
 WORKDIR /home/svcuser
