@@ -42,9 +42,9 @@ USER svcuser
 WORKDIR /home/svcuser
 
 # ensure expected temp dir will exist and is only readable by svcuser
-WORKDIR /tmp/http_rtrvr_temp
-RUN chown svcuser:svcuser /tmp/http_rtrvr_temp
-RUN chmod 700 /tmp/http_rtrvr_temp
+WORKDIR /home/svcuser/tmp/http_rtrvr_temp
+RUN chown svcuser:svcuser /home/svcuser/tmp/http_rtrvr_temp
+RUN chmod 700 /home/svcuser/tmp/http_rtrvr_temp
 # change to home directory
 WORKDIR /home/svcuser
 
@@ -63,4 +63,5 @@ COPY --chown=svcuser:svcuser http_file_rtrvr http_file_rtrvr/
 # CMD [ "sleep", "600"]
 
 # run the environment-variable-based http file retriever
-CMD [ "python3", "http_file_rtrvr/env_var_http_file_rtrvr.py" ]
+# CMD [ "python3", "http_file_rtrvr/env_var_http_file_rtrvr.py" ]
+CMD [ "python3", "http_file_rtrvr/azure_svc_bus_http_file_rtrvr.py" ]
