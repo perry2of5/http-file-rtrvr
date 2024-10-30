@@ -23,20 +23,29 @@ The service expects to retrieve credentials from the Azure Container it is runni
 
 
 ## Request Format
-Requests should be sent as JSON.
+Requests over messaging should be sent as JSON.
 
     {
         "method": "GET",
-        "url": "http://example.com/some/file",
+        "url": "http://example.com/index.html",
+        "save_to": "some/prefix/for/files",
         "timeout_seconds": 5
     }
 
+The file retrieved from above request will be written to:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<i>&lt;storage account&gt;/&lt;storage container&gt;/some/prefix/for/files/&lt;yyyy-MM-ddTHH-mm-ss>/index.html</i><br>
+where the storage account and container come from the environment when the service is started and the date-time is from when the download was started.
+
 The following fields are mandatory:
-- url
+- url: URL of the simple file or archive to download.
+- save_to: prefix of blob to save to within the storage container. This will have the date and time of the download appended to it and the file will be saved under that.
+- 
 
 The following fields are optional:
 - method: defaults to GET. Valid options are GET or POST
 - timeout_seconds: integer seconds, defaults to 5 seconds
+- file_type: the type of the resource to download can be a SIMPLE file or an ARCHIVE file. Future work could add support for downloading a directory from FTP or SFTP or something.
+- http_headers: a map of HTTP headers to send with the request to the URL. These are parsed into a map from json or the environment variable using "literal_eval".
 
 
 ## Exit Codes
