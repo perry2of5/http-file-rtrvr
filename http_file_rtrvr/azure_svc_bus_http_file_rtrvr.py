@@ -113,12 +113,10 @@ def process_rtrvl_msg(rtrvl_svc: RetrievalSvc, msg: ServiceBusMessage,
     rtrvl_req = parse_msg_body(msg)
     print('Processing retrieval request...', msg.message_id)
     rtrvl_result = rtrvl_svc.retrieve(rtrvl_req)
-    print("finished")
-    print("finished", msg.message_id, "at", datetime.now(), "with status", rtrvl_result.status.value)
+    print('URL retrieved for message', msg.message_id)
     if rtrvl_req.reply_to is not None:
-        print("Sending response to", rtrvl_req.reply_to)
         send_response(rtrvl_req.reply_to, rtrvl_result, servicebus_client)
-    print("message processed")
+    print("finished", msg.message_id, "at", datetime.now(), "with status", rtrvl_result.status.value)
     return rtrvl_result
 
 def parse_msg_body(msg: ServiceBusMessage) -> RetrievalRequest:
@@ -143,11 +141,8 @@ def send_response(queue_name: str, rtrvl_result: RetrievalResponse, servicebus_c
     sender = servicebus_client.get_queue_sender(queue_name=queue_name)
     with sender:
         try:
-            print("Preparing json")
             json = dumps(rtrvl_result, default=vars)
-            print("json:", json)
             message = ServiceBusMessage(json)
-            print("Sending response to", queue_name)
             sender.send_messages(message)
             print("Sent response to", queue_name)
         except Exception as e:
