@@ -13,10 +13,9 @@ WORKSPACE_DIR=$(pwd)
 
 # Change some Poetry settings to better deal with working in a container
 poetry config cache-dir ${WORKSPACE_DIR}/.cache
+poetry config virtualenvs.in-project true
 
 # Now install all dependencies
-poetry export --without-hashes --format=requirements.txt > ./requirements.txt
-pip install -r ./requirements.txt
-rm requirements.txt
+poetry install
 
 echo "Done!"
