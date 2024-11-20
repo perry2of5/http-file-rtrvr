@@ -1,6 +1,6 @@
 #!/bin/zsh
 
-export DPLMNT_SFFX="11-13-v8"
+export DPLMNT_SFFX="v1"
 
 export RESOURCE_GROUP="file-dwnld-job-resource-grp-${DPLMNT_SFFX}"
 export ENVIRONMENT="fl-dwnld-jb-nvrnmnt-${DPLMNT_SFFX}"
@@ -18,7 +18,7 @@ export IDENTITY_NAME="asb-http-retriever-identity-${DPLMNT_SFFX}"
 
 # ASB = Azure Service Bus
 export ASB_SUBSCRIPTION=$(az account show --query id --output tsv)
-export ASB_NAMESPACE=http-download-asb-11-13-${DPLMNT_SFFX}
+export ASB_NAMESPACE=http-download-asb-${DPLMNT_SFFX}
 export ASB_RESOURCE_GRP=${RESOURCE_GROUP}
 export ASB_DWNLD_REQ_QUEUE_NAME=file-download-request
 export ASB_DWNLD_CMPLT_QUEUE_NAME=file-download-complete
