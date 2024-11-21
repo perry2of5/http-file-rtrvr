@@ -1,5 +1,10 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the
 // README at: https://github.com/devcontainers/templates/tree/main/src/docker-existing-dockerfile
+//
+// On MacOS install pinentry-mac to enable signing git commits based on a key found in the MacOS
+// keychain. Put the following line in your ~/.gnupg/gpg-agent.conf file:
+// pinentry-program /usr/local/bin/pinentry-mac
+
 {
 	"name": "Python 3",
 	"build": {
@@ -32,12 +37,9 @@
 	},
 	"mounts": [
 		"source=${localEnv:HOME}/.azure,target=/home/vscode/.azure,type=bind,consistency=cached",
-		"source=${localEnv:HOME}/.gitconfig,target=/home/vscode/.gitconfig,type=bind,consistency=cached",
-		"source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=bind,consistency=cached",
-		"source=${localEnv:HOME}/.gnupg,target=/home/vscode/.gnupg,type=bind,consistency=cached"
+		"source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=bind,consistency=cached"
 	],
 	"postCreateCommand": "bash ./.devcontainer/post-install.sh"
-
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {},
