@@ -28,6 +28,7 @@ message_lock_renewer = AutoLockRenewer(
     on_lock_renew_failure=lock_renewal_failure_callback
 )
 
+# TODO: Switch to logging library
 def main():
     print("Starting Azure Service Bus HTTP file retriever at", datetime.now())
     try:
