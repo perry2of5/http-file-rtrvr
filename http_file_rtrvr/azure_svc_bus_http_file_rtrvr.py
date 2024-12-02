@@ -107,7 +107,9 @@ def process_messages(servicebus_client: ServiceBusClient, queue_name: str, rtrvl
                         print("Message processing failure at", datetime.now(), e)
     print("Finished processing messages at", datetime.now())
 
-def process_rtrvl_msg(rtrvl_svc: RetrievalSvc, msg: ServiceBusMessage,
+def process_rtrvl_msg(
+        rtrvl_svc: RetrievalSvc,
+        msg: ServiceBusMessage,
         servicebus_client: ServiceBusClient) -> RetrievalResponse:
     print(str(msg))
     rtrvl_req = parse_msg_body(msg)
@@ -115,7 +117,7 @@ def process_rtrvl_msg(rtrvl_svc: RetrievalSvc, msg: ServiceBusMessage,
     rtrvl_result = rtrvl_svc.retrieve(rtrvl_req)
     print('URL retrieved for message', msg.message_id)
     if msg.reply_to is not None:
-        send_response(msg.reply_to, rtrvl_result, servicebus_client)
+        send_response(msg, rtrvl_result, servicebus_client)
     print("finished", msg.message_id, "at", datetime.now(), "with status", rtrvl_result.status.value)
     return rtrvl_result
 
@@ -134,12 +136,59 @@ def parse_msg_body(msg: ServiceBusMessage) -> RetrievalRequest:
         rtrvl_req.http_headers = literal_eval(target_rtrvl_http_headers_str)
     return rtrvl_req
 
-def send_response(queue_name: str, rtrvl_result: RetrievalResponse, servicebus_client: ServiceBusClient):
+def send_response(
+        msg: ServiceBusMessage,
+        rtrvl_result: RetrievalResponse,
+        servicebus_client: ServiceBusClient
+    ):
+    if msg.reply_to is None:
+        if msg.message_id is None:
+            print("No reply_to or message_id in message")
+            return
+        else:
+            print("No reply_to in message", msg.message_id) 
+            return
+    elif msg.message_id is None:
+        print("No message_id in message")
+        return
+    # check if msg.reply_to_type is topic ignoring case
+    if (msg.application_properties is None or 
+            msg.application_properties.get('reply_to_type') != 'topic'):
+        send_response_queue(msg.reply_to, msg.message_id, rtrvl_result, servicebus_client)
+    else:
+        send_response_topic(msg.reply_to, msg.message_id, rtrvl_result, servicebus_client)
+
+def send_response_topic(
+        topic_name: str,
+        correlation_id: str, 
+        rtrvl_result: RetrievalResponse,
+        servicebus_client: ServiceBusClient
+    ):
+    sender = servicebus_client.get_topic_sender(topic_name=topic_name)
+    with sender:
+        try:
+            json = dumps(rtrvl_result, default=vars)
+            message = ServiceBusMessage(json)
+            message.correlation_id = correlation_id
+            sender.send_messages(message)
+            print("Sent response to", topic_name)
+        except Exception as e:
+            print("Failed to send response to", topic_name, ":", e)
+    print("response sent", message.message_id)
+
+
+def send_response_queue(
+        queue_name: str,
+        correlation_id: str,
+        rtrvl_result: RetrievalResponse,
+        servicebus_client: ServiceBusClient
+    ):
     sender = servicebus_client.get_queue_sender(queue_name=queue_name)
     with sender:
         try:
             json = dumps(rtrvl_result, default=vars)
             message = ServiceBusMessage(json)
+            message.correlation_id = correlation_id
             sender.send_messages(message)
             print("Sent response to", queue_name)
         except Exception as e:
