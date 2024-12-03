@@ -110,53 +110,56 @@ def process_messages(servicebus_client: ServiceBusClient, queue_name: str, rtrvl
 def process_rtrvl_msg(
         rtrvl_svc: RetrievalSvc,
         msg: ServiceBusMessage,
-        servicebus_client: ServiceBusClient) -> RetrievalResponse:
-    print(str(msg))
-    rtrvl_req = parse_msg_body(msg)
-    print('Processing retrieval request...', msg.message_id)
-    rtrvl_result = rtrvl_svc.retrieve(rtrvl_req)
-    print('URL retrieved for message', msg.message_id)
-    if msg.reply_to is not None:
-        send_response(msg, rtrvl_result, servicebus_client)
-    print("finished", msg.message_id, "at", datetime.now(), "with status", rtrvl_result.status.value)
-    return rtrvl_result
+        servicebus_client: ServiceBusClient
+    ) -> RetrievalResponse:
+        print(str(msg))
+        rtrvl_req = parse_msg_body(msg)
+        print('Processing retrieval request...', msg.message_id)
+        rtrvl_result = rtrvl_svc.retrieve(rtrvl_req)
+        print('URL retrieved for message', msg.message_id)
+        if msg.reply_to is not None:
+            send_response(msg, rtrvl_result, servicebus_client)
+        print("finished", msg.message_id, "at", datetime.now(), "with status", rtrvl_result.status.value)
+        return rtrvl_result
 
-def parse_msg_body(msg: ServiceBusMessage) -> RetrievalRequest:
-    msg_req = loads(str(msg))
+def parse_msg_body(
+        msg: ServiceBusMessage
+    ) -> RetrievalRequest:
+        msg_req = loads(str(msg))
 
-    rtrvl_req = RetrievalRequest(
-                url=msg_req.get('url'),
-                method=SupportedHttpMethod[msg_req.get('method', 'GET').upper()],
-                timeout_seconds=int(msg_req.get('timeout_secs', '10')),
-                save_to=msg_req.get('save_to'),
-                file_type=FileType[msg_req.get('file_type', 'SIMPLE').upper()]
-            )
-    target_rtrvl_http_headers_str = msg_req.get('http_headers', None)
-    if target_rtrvl_http_headers_str is not None and len(target_rtrvl_http_headers_str) > 0:
-        rtrvl_req.http_headers = literal_eval(target_rtrvl_http_headers_str)
-    return rtrvl_req
+        rtrvl_req = RetrievalRequest(
+                    url=msg_req.get('url'),
+                    method=SupportedHttpMethod[msg_req.get('method', 'GET').upper()],
+                    timeout_seconds=int(msg_req.get('timeout_secs', '10')),
+                    save_to=msg_req.get('save_to'),
+                    file_type=FileType[msg_req.get('file_type', 'SIMPLE').upper()]
+                )
+        target_rtrvl_http_headers_str = msg_req.get('http_headers', None)
+        if target_rtrvl_http_headers_str is not None and len(target_rtrvl_http_headers_str) > 0:
+            rtrvl_req.http_headers = literal_eval(target_rtrvl_http_headers_str)
+        return rtrvl_req
 
 def send_response(
         msg: ServiceBusMessage,
         rtrvl_result: RetrievalResponse,
         servicebus_client: ServiceBusClient
     ):
-    if msg.reply_to is None:
-        if msg.message_id is None:
-            print("No reply_to or message_id in message")
+        if msg.reply_to is None:
+            if msg.message_id is None:
+                print("No reply_to or message_id in message")
+                return
+            else:
+                print("No reply_to in message", msg.message_id) 
+                return
+        elif msg.message_id is None:
+            print("No message_id in message")
             return
+        # check if msg.reply_to_type is topic ignoring case
+        if (msg.application_properties is None or 
+                msg.application_properties.get('reply_to_type') != 'topic'):
+            send_response_queue(msg.reply_to, msg.message_id, rtrvl_result, servicebus_client)
         else:
-            print("No reply_to in message", msg.message_id) 
-            return
-    elif msg.message_id is None:
-        print("No message_id in message")
-        return
-    # check if msg.reply_to_type is topic ignoring case
-    if (msg.application_properties is None or 
-            msg.application_properties.get('reply_to_type') != 'topic'):
-        send_response_queue(msg.reply_to, msg.message_id, rtrvl_result, servicebus_client)
-    else:
-        send_response_topic(msg.reply_to, msg.message_id, rtrvl_result, servicebus_client)
+            send_response_topic(msg.reply_to, msg.message_id, rtrvl_result, servicebus_client)
 
 def send_response_topic(
         topic_name: str,
@@ -164,17 +167,16 @@ def send_response_topic(
         rtrvl_result: RetrievalResponse,
         servicebus_client: ServiceBusClient
     ):
-    sender = servicebus_client.get_topic_sender(topic_name=topic_name)
-    with sender:
-        try:
-            json = dumps(rtrvl_result, default=vars)
-            message = ServiceBusMessage(json)
-            message.correlation_id = correlation_id
-            sender.send_messages(message)
-            print("Sent response to", topic_name)
-        except Exception as e:
-            print("Failed to send response to", topic_name, ":", e)
-    print("response sent", message.message_id)
+        sender = servicebus_client.get_topic_sender(topic_name=topic_name)
+        with sender:
+            try:
+                json = dumps(rtrvl_result, default=vars)
+                message = ServiceBusMessage(json, correlation_id=correlation_id)
+                sender.send_messages(message)
+                print("Sent response to", topic_name)
+            except Exception as e:
+                print("Failed to send response to", topic_name, ":", e)
+        print("response sent", message.message_id)
 
 
 def send_response_queue(
@@ -183,17 +185,16 @@ def send_response_queue(
         rtrvl_result: RetrievalResponse,
         servicebus_client: ServiceBusClient
     ):
-    sender = servicebus_client.get_queue_sender(queue_name=queue_name)
-    with sender:
-        try:
-            json = dumps(rtrvl_result, default=vars)
-            message = ServiceBusMessage(json)
-            message.correlation_id = correlation_id
-            sender.send_messages(message)
-            print("Sent response to", queue_name)
-        except Exception as e:
-            print("Failed to send response to", queue_name, ":", e)
-    print("response sent", message.message_id)
+        sender = servicebus_client.get_queue_sender(queue_name=queue_name)
+        with sender:
+            try:
+                json = dumps(rtrvl_result, default=vars)
+                message = ServiceBusMessage(json, correlation_id=correlation_id)
+                sender.send_messages(message)
+                print("Sent response to", queue_name)
+            except Exception as e:
+                print("Failed to send response to", queue_name, ":", e)
+        print("response sent", message.message_id)
 
 if __name__ == "__main__":
     main()
