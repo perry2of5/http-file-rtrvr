@@ -1,8 +1,11 @@
 #!/bin/zsh
 
-export DPLMNT_SFFX="v1"
+# we need the single quotes in the az command so they are wrapped in the double quotes so they'll be preserved
+export AIRFLOW_APP_NAME="'tim-dev-http-dwnld-asb'"
 
-export RESOURCE_GROUP="file-dwnld-job-resource-grp-${DPLMNT_SFFX}"
+export DPLMNT_SFFX="2024-12-02-v2"
+
+export RESOURCE_GROUP="file-dwnld-job-resrc-grp-${DPLMNT_SFFX}"
 export ENVIRONMENT="fl-dwnld-jb-nvrnmnt-${DPLMNT_SFFX}"
 export LOCATION="westus"
 export JOB_NAME="file-download-job-${DPLMNT_SFFX}"
@@ -21,7 +24,7 @@ export ASB_SUBSCRIPTION=$(az account show --query id --output tsv)
 export ASB_NAMESPACE=http-download-asb-${DPLMNT_SFFX}
 export ASB_RESOURCE_GRP=${RESOURCE_GROUP}
 export ASB_DWNLD_REQ_QUEUE_NAME=file-download-request
-export ASB_DWNLD_CMPLT_QUEUE_NAME=file-download-complete
+export ASB_DWNLD_CMPLT_TOPIC_NAME=file-download-complete
 # need to be data owner on the bus to get the number of messages to scale....
 export ASB_IAM_ROLE="Azure Service Bus Data Owner"
 

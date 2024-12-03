@@ -34,13 +34,20 @@ export ASB_REQ_Q_SCOPE=$(az servicebus queue show --name ${ASB_DWNLD_REQ_QUEUE_N
 az role assignment create --role "${ASB_IAM_ROLE}" --assignee ${IDENTITY_CLIENT_ID} \
     --scope "${ASB_REQ_Q_SCOPE}"
 
-# reply queue
-az servicebus queue create --resource-group ${RESOURCE_GROUP} --namespace-name ${ASB_NAMESPACE} \
-    --name ${ASB_DWNLD_CMPLT_QUEUE_NAME}
-export ASB_RESP_Q_SCOPE=$(az servicebus queue show --name ${ASB_DWNLD_CMPLT_QUEUE_NAME} \
+# reply topic
+az servicebus topic create --resource-group ${RESOURCE_GROUP} --namespace-name ${ASB_NAMESPACE} \
+    --name ${ASB_DWNLD_CMPLT_TOPIC_NAME}
+export ASB_RESP_TOPIC_SCOPE=$(az servicebus topic show --name ${ASB_DWNLD_CMPLT_TOPIC_NAME} \
     --namespace-name ${ASB_NAMESPACE} --resource-group ${ASB_RESOURCE_GRP} --query id --output tsv)
 az role assignment create --role "${ASB_IAM_ROLE}" --assignee ${IDENTITY_CLIENT_ID} \
-    --scope "${ASB_RESP_Q_SCOPE}"
+    --scope "${ASB_RESP_TOPIC_SCOPE}"
+
+# Grant access to reply topic and request queue to the airflow app
+export AIRFLOW_APP_ID=$(az ad app list --filter "displayName eq ${AIRFLOW_APP_NAME}" --query '[0].appId' --output tsv)
+az role assignment create --role "${ASB_IAM_ROLE}" --assignee ${AIRFLOW_APP_ID} \
+    --scope "${ASB_RESP_TOPIC_SCOPE}"
+az role assignment create --role "${ASB_IAM_ROLE}" --assignee ${AIRFLOW_APP_ID} \
+    --scope "${ASB_REQ_Q_SCOPE}"
 
 
 
@@ -72,6 +79,7 @@ az containerapp job create --name "${JOB_NAME}" \
     --environment "${ENVIRONMENT}" \
     --trigger-type "Event" \
     --replica-timeout "1800" \
+     --replica-retry-limit 2 \
     --min-executions "0" \
     --max-executions "1" \
     --polling-interval "300" \

@@ -19,7 +19,7 @@ az role assignment create --role "Storage Blob Data Contributor" --assignee ${CU
 
 export ASB_REQ_Q_SCOPE=$(az servicebus queue show --name ${ASB_DWNLD_REQ_QUEUE_NAME} \
     --namespace-name ${ASB_NAMESPACE} --resource-group ${ASB_RESOURCE_GRP} --query id --output tsv)
-export ASB_RESP_Q_SCOPE=$(az servicebus queue show --name ${ASB_DWNLD_CMPLT_QUEUE_NAME} \
+export ASB_RESP_Q_SCOPE=$(az servicebus topic show --name ${ASB_DWNLD_CMPLT_TOPIC_NAME} \
     --namespace-name ${ASB_NAMESPACE} --resource-group ${ASB_RESOURCE_GRP} --query id --output tsv)
 
 az role assignment create --role "Azure Service Bus Data Owner" --assignee ${USER_ID} \
