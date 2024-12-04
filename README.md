@@ -47,6 +47,20 @@ The following fields are optional:
 - file_type: the type of the resource to download can be a SIMPLE file or an ARCHIVE file. Future work could add support for downloading a directory from FTP or SFTP or something.
 - http_headers: a map of HTTP headers to send with the request to the URL. These are parsed into a map from json or the environment variable using "literal_eval".
 
+### Response destination
+Response destination is controlled using the standard ```reply_to``` header and the application-specific ```reply_to_type``` header. The ```reply_to_type``` header may be either "topic" or "queue" and is assumed to be a queue if not specified. 
+
+## Response format
+
+    {
+        "source_url": "http://example.com/index.html",
+        "status": "0000",
+        "file_type": "simple",
+        "method": "GET",
+        "save_to_key": "some/prefix/for/files/2024-12-03T21-20-52/index.html",
+        "saved_to_fqn": "https://devtimstoregrp1.blob.core.windows.net/testcontainer/some/prefix/for/files/2024-12-03T21-20-52/index.html"
+    }
+
 
 ## Exit Codes
 Exit codes are broken into different series where 1xx are access failures, 2xx are file format failures, 3xx are concerns with file contents such as malware, 4xx indicates the files couldn't be uploaded to the staging area for dispatch for further processing (Airbyte), and 5xx indicates errors replying to the system which requested the file retrieval.
