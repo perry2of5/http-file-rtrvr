@@ -3,7 +3,7 @@
 # we need the single quotes in the az command so they are wrapped in the double quotes so they'll be preserved
 export AIRFLOW_APP_NAME="'tim-dev-http-dwnld-asb'"
 
-export DPLMNT_SFFX="2024-12-04-v1"
+export DPLMNT_SFFX="2024-12-04-v2"
 
 export RESOURCE_GROUP="http-rtrvr-rsrc-grp-${DPLMNT_SFFX}"
 export ENVIRONMENT="http-rtrvr-nvrnmnt-${DPLMNT_SFFX}"
@@ -15,7 +15,7 @@ export CONTAINER_IMAGE_NAME="http-rtrvr-queue-reader-job:1.0"
 # need repeatable ACR name for now.
 # export CONTAINER_REGISTRY_NAME="tdpacareg202411130843125399139870"
 # this will make an ACR name based off the date and time with a random number appended to the end.
-export CONTAINER_REGISTRY_NAME="tdpacareg$(date "+%Y%m%dT%H%M%Srnd")$(head -200 /dev/urandom | cksum | cut -f1 -d " ")"
+export CONTAINER_REGISTRY_NAME="tdpacareg$(date "+%Y%m%dt%H%M%Srnd")$(head -200 /dev/urandom | cksum | cut -f1 -d " ")"
 
 export IDENTITY_NAME="http-rtrvr-identity-asb-${DPLMNT_SFFX}"
 
