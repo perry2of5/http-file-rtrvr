@@ -3,7 +3,7 @@
 # we need the single quotes in the az command so they are wrapped in the double quotes so they'll be preserved
 export AIRFLOW_APP_NAME="'tim-dev-http-dwnld-asb'"
 
-export DPLMNT_SFFX="2024-12-04-v2"
+export DPLMNT_SFFX="2024-12-18-v2"
 
 export RESOURCE_GROUP="http-rtrvr-rsrc-grp-${DPLMNT_SFFX}"
 export ENVIRONMENT="http-rtrvr-nvrnmnt-${DPLMNT_SFFX}"
@@ -13,7 +13,7 @@ export JOB_NAME="http-rtrvr-job-${DPLMNT_SFFX}"
 export CONTAINER_IMAGE_NAME="http-rtrvr-queue-reader-job:1.0"
 
 # need repeatable ACR name for now.
-# export CONTAINER_REGISTRY_NAME="tdpacareg202411130843125399139870"
+# export CONTAINER_REGISTRY_NAME="tdpacareg202412180955125399139870"
 # this will make an ACR name based off the date and time with a random number appended to the end.
 export CONTAINER_REGISTRY_NAME="tdpacareg$(date "+%Y%m%dt%H%M%Srnd")$(head -200 /dev/urandom | cksum | cut -f1 -d " ")"
 
@@ -28,7 +28,7 @@ export ASB_DWNLD_CMPLT_TOPIC_NAME=file-rtrvr-complete
 # need to be data owner on the bus to get the number of messages to scale....
 export ASB_IAM_ROLE="Azure Service Bus Data Owner"
 
-export STORAGE_ACCOUNT_NAME=devtimstoregrp1
+export STORAGE_ACCOUNT_NAME=strgrp`echo ${DPLMNT_SFFX} | sed 's/-//g'`
 export STORAGE_ACCOUNT_URL=https://${STORAGE_ACCOUNT_NAME}.blob.core.windows.net
 export STORAGE_CONTAINER_NAME=testcontainer
 
