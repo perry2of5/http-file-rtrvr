@@ -2,8 +2,10 @@
 
 source ${0:a:h}/env-vars.zsh
 
+echo create resource group ${RESOURCE_GROUP}
 az group create --name ${RESOURCE_GROUP} --location ${LOCATION}
 
+echo create identity
 # identity to access queues and storage:
 az identity create --resource-group ${RESOURCE_GROUP} --name ${IDENTITY_NAME} --output json
 export IDENTITY_CLIENT_ID=$(az identity show --name ${IDENTITY_NAME} --resource-group "${RESOURCE_GROUP}" \
@@ -11,6 +13,7 @@ export IDENTITY_CLIENT_ID=$(az identity show --name ${IDENTITY_NAME} --resource-
 export IDENTITY_ID=$(az identity show --name ${IDENTITY_NAME} --resource-group "${RESOURCE_GROUP}" \
     --query id --output tsv)
 
+echo create service bus namespace, request queue, and reply topic
 # ###### Create Service Bus Namespace and Queues ######
 az servicebus namespace create --resource-group ${RESOURCE_GROUP} --name ${ASB_NAMESPACE} --location ${LOCATION}
 export ASB_NAMESPACE_SCOPE=$(az servicebus namespace show --resource-group ${RESOURCE_GROUP} \
@@ -50,7 +53,7 @@ az role assignment create --role "${ASB_IAM_ROLE}" --assignee ${AIRFLOW_APP_ID} 
     --scope "${ASB_REQ_Q_SCOPE}"
 
 
-
+echo create storage account to store files to
 # create storage account to store downloaded files in
 az storage account create --name ${STORAGE_ACCOUNT_NAME} --resource-group ${RESOURCE_GROUP} \
     --location ${LOCATION} --sku Standard_RAGRS --kind StorageV2 --min-tls-version TLS1_2 \
@@ -61,7 +64,7 @@ export STORAGE_ACCOUNT_SCOPE=$(az storage account blob-service-properties show \
 az role assignment create --role "Storage Blob Data Contributor" --assignee ${IDENTITY_CLIENT_ID} \
     --scope "${STORAGE_ACCOUNT_SCOPE}"
 
-
+echo create container registry
 # create container registry
 az acr create --name "${CONTAINER_REGISTRY_NAME}" --resource-group "${RESOURCE_GROUP}" \
     --location "${LOCATION}" --sku Basic --admin-enabled true
@@ -69,9 +72,10 @@ az acr create --name "${CONTAINER_REGISTRY_NAME}" --resource-group "${RESOURCE_G
 az acr build --registry "${CONTAINER_REGISTRY_NAME}" \
     --image "${CONTAINER_IMAGE_NAME}"  "https://github.com/perry2of5/http-file-rtrvr.git"
 
-
+echo create container app environment
 az containerapp env create --name ${ENVIRONMENT} --resource-group ${RESOURCE_GROUP} --location ${LOCATION}
 
+echo create container app job
 # The AZURE_CLIENT_ID environment variable tells the python azure-identify library to look for the user-managed identity
 # https://learn.microsoft.com/en-us/python/api/overview/azure/identity-readme?view=azure-python#specify-a-user-assigned-managed-identity-with-defaultazurecredential
 az containerapp job create --name "${JOB_NAME}" \
@@ -79,7 +83,7 @@ az containerapp job create --name "${JOB_NAME}" \
     --environment "${ENVIRONMENT}" \
     --trigger-type "Event" \
     --replica-timeout "1800" \
-     --replica-retry-limit 2 \
+    --replica-retry-limit 2 \
     --min-executions "0" \
     --max-executions "1" \
     --polling-interval "300" \
@@ -89,9 +93,7 @@ az containerapp job create --name "${JOB_NAME}" \
         "namespace=${ASB_NAMESPACE}" \
         "queueName=${ASB_DWNLD_REQ_QUEUE_NAME}" \
         "messageCount=1" \
-    --scale-rule-auth "connection=connection-string-secret" \
-    --secrets \
-        "connection-string-secret=${ASB_CONN_STR}" \
+    --scale-rule-identity "${IDENTITY_ID}" \
     --image "${CONTAINER_REGISTRY_NAME}.azurecr.io/${CONTAINER_IMAGE_NAME}" \
     --cpu "0.5" \
     --memory "1Gi" \
@@ -104,6 +106,10 @@ az containerapp job create --name "${JOB_NAME}" \
         "QUEUE_NAME=${ASB_DWNLD_REQ_QUEUE_NAME}" \
         "AZURE_CLIENT_ID=${IDENTITY_CLIENT_ID}" \
     --mi-user-assigned "${IDENTITY_ID}"
+
+    # --scale-rule-auth "connection=connection-string-secret" \
+    # --secrets \
+    #     "connection-string-secret=${ASB_CONN_STR}" \
 
 # az containerapp job identity assign --name "${JOB_NAME}" --resource-group "${RESOURCE_GROUP}" \
 #     --user-assigned "${IDENTITY_NAME}"
